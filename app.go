@@ -21,6 +21,11 @@ func (a *app) run() error {
 	defer termbox.Flush()
 	defer termbox.Close()
 
+	// load position.
+	chap, line := LoadState(a.book)
+	a.chapter = chap
+	a.pager.scrollY = line
+
 	if err := a.openChapter(); err != nil {
 		return err
 	}
@@ -36,20 +41,26 @@ func (a *app) run() error {
 				return nil
 			case termbox.KeyArrowDown:
 				a.pager.scrollDown()
+				SaveState(a.book, a.chapter, a.pager.scrollY)
 			case termbox.KeyArrowUp:
 				a.pager.scrollUp()
+				SaveState(a.book, a.chapter, a.pager.scrollY)
 			case termbox.KeyArrowRight:
 				a.pager.scrollRight()
+				SaveState(a.book, a.chapter, a.pager.scrollY)
 			case termbox.KeyArrowLeft:
 				a.pager.scrollLeft()
+				SaveState(a.book, a.chapter, a.pager.scrollY)
 			default:
 				switch ev.Ch {
 				case 'q':
 					return nil
 				case 'j':
 					a.pager.scrollDown()
+					SaveState(a.book, a.chapter, a.pager.scrollY)
 				case 'k':
 					a.pager.scrollUp()
+					SaveState(a.book, a.chapter, a.pager.scrollY)
 				case 'h':
 					a.pager.scrollLeft()
 				case 'l':
@@ -64,6 +75,7 @@ func (a *app) run() error {
 						return err
 					}
 					a.pager.toTop()
+					SaveState(a.book, a.chapter, a.pager.scrollY)
 				case 'b':
 					if a.pager.pageUp() || a.chapter <= 0 {
 						continue
@@ -74,10 +86,13 @@ func (a *app) run() error {
 						return err
 					}
 					a.pager.toBottom()
+					SaveState(a.book, a.chapter, a.pager.scrollY)
 				case 'g':
 					a.pager.toTop()
+					SaveState(a.book, a.chapter, a.pager.scrollY)
 				case 'G':
 					a.pager.toBottom()
+					SaveState(a.book, a.chapter, a.pager.scrollY)
 				case 'L':
 					if a.chapter >= len(a.book.Spine.Itemrefs)-1 {
 						continue
@@ -87,6 +102,7 @@ func (a *app) run() error {
 						return err
 					}
 					a.pager.toTop()
+					SaveState(a.book, a.chapter, a.pager.scrollY)
 				case 'H':
 					if a.chapter <= 0 {
 						continue
@@ -96,6 +112,7 @@ func (a *app) run() error {
 						return err
 					}
 					a.pager.toTop()
+					SaveState(a.book, a.chapter, a.pager.scrollY)
 				}
 			}
 		}
