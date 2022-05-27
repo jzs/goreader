@@ -1,6 +1,10 @@
 package main
 
-import termbox "github.com/nsf/termbox-go"
+import (
+	"fmt"
+
+	termbox "github.com/nsf/termbox-go"
+)
 
 type pager struct {
 	scrollX int
@@ -31,6 +35,11 @@ func (p pager) draw() error {
 		}
 	}
 
+	_, docHeight := p.size()
+	txt := fmt.Sprintf("%v/%v", p.scrollY, docHeight)
+	for i, t := range txt {
+		termbox.SetCell(i, 0, rune(t), termbox.ColorBlue, termbox.ColorBlack)
+	}
 	return termbox.Flush()
 }
 
